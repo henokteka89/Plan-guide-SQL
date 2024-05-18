@@ -1,3 +1,72 @@
+ChatGPT 4o
+
+
+Is there a way to make a stored proc to use an index I wanted without putting index hint inside the query?
+
+ChatGPT
+Yes, there are several ways to influence the use of a specific index by a stored procedure without explicitly using an index hint. Here are some strategies you can use:
+
+Index Statistics:
+
+Ensure that the statistics for the indexes are up-to-date. SQL Server uses statistics to decide which index to use, so having accurate and current statistics can help the query optimizer make the best choice.
+sql
+Copy code
+UPDATE STATISTICS table_name index_name;
+Index Rebuild/Reorganize:
+
+Rebuilding or reorganizing indexes can improve their efficiency, making them more likely to be chosen by the query optimizer.
+sql
+Copy code
+ALTER INDEX index_name ON table_name REBUILD;
+ALTER INDEX index_name ON table_name REORGANIZE;
+Query Refactoring:
+
+Refactor your query to make it more likely for the optimizer to choose the desired index. This might involve changing the structure of the query or the way joins and filters are applied.
+Using Plan Guides:
+
+Plan guides allow you to influence the query optimizer’s choice of indexes without changing the actual query. You can create a plan guide to force the optimizer to use a specific index.
+sql
+Copy code
+EXEC sp_create_plan_guide 
+    @name = N'GuideName',
+    @stmt = N'SELECT ... FROM ... WHERE ...', 
+    @type = N'SQL', 
+    @module_or_batch = NULL, 
+    @params = NULL, 
+    @hints = N'OPTION (INDEX (index_name))';
+Indexed Views:
+
+Sometimes creating indexed views that encapsulate your query logic can encourage the optimizer to use the indexes on those views.
+Schema Design:
+
+Ensuring your schema is designed in a way that naturally encourages the use of the desired indexes. This might include setting primary keys and unique constraints that align with the indexes you want to use.
+By using these methods, you can influence the query optimizer to use the indexes you prefer without having to resort to explicit index hints in your queries.
+
+
+
+
+
+
+
+Can you elaborate plan guide?
+
+ChatGPT
+Sure! A plan guide in SQL Server allows you to apply query hints to queries without modifying the actual query text. This can be particularly useful for influencing the query optimizer to use a specific index or other performance-related adjustments.
+
+Creating a Plan Guide
+Here's a step-by-step example of how to create a plan guide:
+
+Identify the Query:
+
+First, you need to identify the exact query you want to optimize. This includes the full text of the query as it is executed.
+Determine the Query Plan Hint:
+
+Decide on the query plan hint you want to apply. For instance, you might want to force the use of a specific index.
+Create the Plan Guide:
+
+Use the sp_create_plan_guide stored procedure to create the plan guide. Here’s an example of creating a plan guide that forces the use of a specific index:
+
+
 Plan Guide
 USE AdventureWorks2012;
 GO
