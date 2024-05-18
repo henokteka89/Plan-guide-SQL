@@ -1,0 +1,17 @@
+Plan Guide
+USE AdventureWorks2012;
+GO
+
+-- Identify the query
+DECLARE @query AS NVARCHAR(MAX);
+SET @query = N'SELECT * FROM Sales.SalesOrderDetail WHERE ProductID = @ProductID';
+
+-- Create the plan guide
+EXEC sp_create_plan_guide 
+    @name = N'SalesOrderDetail_PlanGuide',
+    @stmt = @query,
+    @type = N'SQL',
+    @module_or_batch = NULL,
+    @params = N'@ProductID int',
+    @hints = N'OPTION (FORCE ORDER, INDEX (IX_SalesOrderDetail_ProductID))';
+GO
